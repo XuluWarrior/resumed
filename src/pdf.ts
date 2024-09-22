@@ -21,7 +21,7 @@ export const exportPdf = async (
     path: output,
     format: 'a4',
     printBackground: true,
-    ...theme.pdfRenderOptions,
+    ...theme.default.pdfRenderOptions,
   })
   await browser.close()
 }
