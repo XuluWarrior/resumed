@@ -2,6 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises'
 import sade from 'sade'
 import { red, yellow } from 'yoctocolors'
 import { init, render, validate } from './index.js'
+import { exportPdf } from './pdf.js'
 
 // Trick Rollup into not bundling package.json
 const pkgPath = '../package.json'
@@ -12,6 +13,7 @@ const pkg = JSON.parse(
 type RenderOptions = {
   output: string
   theme?: string
+  format: string
 }
 
 export const cli = sade(pkg.name).version(pkg.version)
@@ -23,10 +25,11 @@ cli
   })
   .option('-o, --output', 'Output filename', 'resume.html')
   .option('-t, --theme', 'Theme to use')
+  .option('-f, --format', 'Export format: html or pdf', 'html')
   .action(
     async (
       filename: string = 'resume.json',
-      { output, theme }: RenderOptions,
+      { output, theme, format }: RenderOptions,
     ) => {
       const resume = JSON.parse(await readFile(filename, 'utf-8'))
 
@@ -54,8 +57,19 @@ cli
         return
       }
 
-      const rendered = await render(resume, themeModule)
-      await writeFile(output, rendered)
+      switch (format) {
+        case 'html':
+          const rendered = await render(resume, themeModule)
+          await writeFile(output, rendered)
+          break
+        case 'pdf':
+          await exportPdf(resume, themeModule, output)
+          break
+        default:
+          console.error(`Unrecognised export format: ${format}`)
+          process.exitCode = 1
+          return
+      }
 
       console.log(
         `You can find your rendered resume at ${yellow(output)}. Nice work! 🚀`,
