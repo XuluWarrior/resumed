@@ -13,7 +13,7 @@ export const exportPdf = async (
 ) => {
   const html = await render(resume, theme)
 
-  const browser = await puppeteer.launch()
+  const browser = await puppeteer.launch({ browser: 'firefox' })
   const page = await browser.newPage()
 
   await page.setContent(html, { waitUntil: 'networkidle0' })
