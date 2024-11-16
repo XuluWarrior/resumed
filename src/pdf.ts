@@ -14,6 +14,7 @@ export const exportPdf = async (
   const html = await render(resume, theme)
 
   const browser = await puppeteer.launch({
+    args: ['--disable-pdf-tagging'],
     ignoreDefaultArgs: ['--export-tagged-pdf'],
   })
   const page = await browser.newPage()
